@@ -29,5 +29,5 @@
         name: "{{ subnet_name }}"
         virtual_network_name: "{{ virtual_network_name }}"
         resource_group: "{{ resource_group }}"
-        address_prefix_cidr: "10.1.0.0/24"
+        address_prefix_cidr: "10.1.0.0/16"
         route_table: "{ route_table_name }"
