@@ -1,10 +1,10 @@
 # Create Route table and Associate it with Subnet
 - hosts: localhost
   vars:
-    subnet_name: mySubnet
-    virtual_network_name: myVirtualNetwork
-    route_table_name: myRouteTable
-    resource_group: myResourceGroup
+    subnet_name: myTESTSubnet
+    virtual_network_name: myTESTVirtualNetwork
+    route_table_name: myTESTRouteTable
+    resource_group: myTESTResourceGroup
   tasks:
     - name: Create virtual network
       azure_rm_virtualnetwork:
