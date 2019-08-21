@@ -4,7 +4,7 @@
     subnet_name: myTESTSubnet
     virtual_network_name: myTESTVirtualNetwork
     route_table_name: myTESTRouteTable
-    resource_group: myTESTResourceGroup
+    resource_group: myResourceGroup
   tasks:
     - name: Create virtual network
       azure_rm_virtualnetwork:
