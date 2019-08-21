@@ -16,6 +16,14 @@
         dns_servers:
         - 127.0.0.1
         - 127.0.0.3
+      
+    - name: Create Subnet and Add to Vnet
+      azure_rm_subnet:
+        resource_group: "{{ resource_group }}"
+        name: "{{ subnet_name }}"
+        address_prefix: "10.10.0.0/24"
+        virtual_network: "{{ virtual_network_name }}"
+
     - name: Create a subnet with route table
       azure_rm_subnet:
         name: "{{ subnet_name }}"
