@@ -1,0 +1,97 @@
+# Create Route table and Associate it with Subnet
+- hosts: localhost
+  vars:
+    subnet_name: myTESTSubnet
+    virtual_network_name: myTESTVirtualNetwork
+    route_table_name: myTESTRouteTable
+    resource_group: myResourceGroup
+    resource_group_2: myTESTResourceGroup
+    route_table: myRouteTable
+    region: Central US
+    peering_name: myPeering
+    Remote_Virtual_Network: myRemoteVirtualNetwork
+    virtual_network_gateway: myVirtualNetwork
+    sku: 655515
+    bgp_peering_address: 169.254.54.209
+
+
+  tasks:
+    - name: Create a Resource Group
+      azure_rm_resourcegroup:
+        name: "{{ resource_group }}"
+        location: "{{ region }}"
+        state: absent
+        tags:
+          testing: testing
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        name: "{{ virtual_network_name }}"
+        resource_group: "{{ resource_group }}"
+        address_prefixes_cidr:
+        - 10.1.0.0/16
+        - 172.100.0.0/16
+        #dns_servers:
+        #- 127.0.0.1
+        #- 127.0.0.3
+      
+    - name: Create Subnet and associate to Vnet
+      azure_rm_subnet:
+        resource_group: "{{ resource_group }}"
+        name: "{{ subnet_name }}"
+        address_prefix: "10.1.0.0/16"
+        virtual_network: "{{ virtual_network_name }}"
+
+    #- name: Create a subnet refer nsg from other resource group
+      #azure_rm_subnet:
+        #resource_group: myResourceGroup
+        #virtual_network_name: myVirtualNetwork
+        #name: mySubnet
+       # address_prefix_cidr: "10.1.0.0/16"
+        #security_group:
+          #name: secgroupfoo
+         # resource_group: mySecondResourceGroup
+      #route_table: route
+
+    - name: Virtual Network gateway with BGP settings
+      azure_rm_virtualnetworkgateway: 
+        resource_group: "{{ resource_group }}"
+        name: "{{ virtual_network_gateway }}"
+        gateway_type: express_route
+        sku: "{{ sku }}"
+        ip_configurations:
+          - name: testipconfig
+            private_ip_allocation_method: Dynamic
+            public_ip+address_name: testipaddr
+        enable_bgp: yes
+        virtual_network: "{{ virtual_network_name }}"
+        bgp_settings:
+          asn: 65515
+          bgp_peering_address: "{{ IP }}"
+        tags:
+          common: "xyz"
+          
+    - name: Create Virtual Network Peering
+      azure_rm_virtualnetworkpeering:
+        resource_group: "{{ resource_group }}"
+        virtual_network: "{{ virtual_network_name }}"
+        name: "{{ peering_name }}"
+        remote_virtual_network:
+          resource_group: "{{ resource_group_2 }}"
+          name: "{{ Remote_Virtual_Network }}"
+        allow_virtual_network _access: false
+        allow_forwarded_traffic: true
+      
+    - name: Create Route Table
+      azure_rm_routetable:
+        resource_group: "{{ resource_group }}"
+        name: "{{ route_table }}"
+
+
+    - name: Create a subnet with route table
+      azure_rm_subnet:
+        name: "{{ subnet_name }}"
+        virtual_network_name: "{{ virtual_network_name }}"
+        resource_group: "{{ resource_group }}"
+        address_prefix_cidr: "10.1.0.0/16"
+        route_table: "{{ route_table }}"
